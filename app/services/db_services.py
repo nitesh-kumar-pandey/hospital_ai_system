@@ -46,7 +46,7 @@ def init_db():
                patient_id TEXT
           );
           
-          CREATE TABLEIF NOT EXISTS patients(
+          CREATE TABLE IF NOT EXISTS patients(
                patient_id TEXT PRIMARY KEY,
                patient_name TEXT,
                age INTEGER,
@@ -54,12 +54,12 @@ def init_db():
                vitals TEXT,
                priority_level TEXT,
                priority_score INTEGER,
-               priority_reasoning TEXT
-               assigned_bed TEXT
-               assigned_doctor TEXT
-               estimated_wait_minutes INTEGER
-               status TEXT
-               timestamp TEXT      
+               priority_reasoning TEXT,
+               assigned_bed TEXT,
+               assigned_doctor TEXT,
+               estimated_wait_minutes INTEGER,
+               status TEXT,
+               timestamp TEXT,      
           );
      """)
 
