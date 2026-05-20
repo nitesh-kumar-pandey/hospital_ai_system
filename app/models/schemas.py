@@ -14,3 +14,24 @@ class VitalsSchema(BaseModel):
 class PatientAdmitRequest(BaseModel):
      patient_name: str = Field(..., example="John Doe")
      age: int = Field(...,example=45)
+     symptoms : str = Field(..., example="Chest pain and shortness of breath")
+     vitals: Dict[str,Any] = Field(...,example={
+          "heart_rate": 110,
+          "systolic_bp": 160,
+          "spo2": 94,
+          "temprature": 99.1
+     })
+
+
+class ALLocationResponse(BaseModel):
+     patient_id: str
+     patient_name: Optional[str]
+     priority_level: Optional[str]
+     priority_score: Optional[str]
+     priority_reasoning: Optional[str]
+     assigned_bed: Optional[str]
+     assigned_doctor: Optional[str]
+     estimated_wait_minutes: Optional[int]
+     status: Optional[str]
+     timestamp: Optional[str]
+     errors: Optional[list]
