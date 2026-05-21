@@ -87,7 +87,7 @@ def get_resource_snapshot() -> dict:
      return {"icu_beds": icu, "general_beds":gen, "doctors":docs}
 
 
-def allocated_resources(bed_type:str) -> tuple:
+def allocate_resource(bed_type:str) -> tuple:
      """Automatically assign a bed and doctor. Returns (bed_id, doctor_name)."""
      with _lock:
           conn = get_connection()
