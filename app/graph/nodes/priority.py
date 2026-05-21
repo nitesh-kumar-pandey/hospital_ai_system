@@ -25,7 +25,7 @@ Symptoms: {symptoms}
 Vitals: {json.dumps(vitals)}
 
 Read ONLY with a valid JSON object - no markdown, no explanation, no extra text:
-{{"priority_level":"Critical|High|Medium|Low","priority_score":<1-100>,"reasoning:"<one sentence>"}}
+{{"priority_level":"Critical|High|Medium|Low","priority_score":<1-100>,"reasoning":<one sentence>"}}
 
 Rules:
 - Critical (85-100): life-threatening(cardiac arrest, no breathing, major trauma, SpO2<85)

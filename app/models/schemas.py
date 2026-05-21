@@ -27,7 +27,7 @@ class ALLocationResponse(BaseModel):
      patient_id: str
      patient_name: Optional[str]
      priority_level: Optional[str]
-     priority_score: Optional[str]
+     priority_score: Optional[int]
      priority_reasoning: Optional[str]
      assigned_bed: Optional[str]
      assigned_doctor: Optional[str]

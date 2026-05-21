@@ -59,7 +59,7 @@ def init_db():
                assigned_doctor TEXT,
                estimated_wait_minutes INTEGER,
                status TEXT,
-               timestamp TEXT,      
+               timestamp TEXT
           );
      """)
 
@@ -94,7 +94,7 @@ def allocate_resource(bed_type:str) -> tuple:
           c = conn.cursor()
 
           bed = c.execute(
-               "SELECT bed_id FROM beds WHERE bed_types=? AND occupied=0 LIMIT 1",
+               "SELECT bed_id FROM beds WHERE bed_type=? AND occupied=0 LIMIT 1",
                (bed_type,)
           ).fetchone()
 
@@ -108,7 +108,7 @@ def allocate_resource(bed_type:str) -> tuple:
           if bed_id:
                c.execute("UPDATE beds SET occupied=1 WHERE bed_id=?",(bed_id,))
           if doctor:
-               c.execute("UPDATE doctors SET bsuy=1 WHERE doctor_id=?", (doc_id,))
+               c.execute("UPDATE doctors SET busy=1 WHERE doctor_id=?", (doc_id,))
 
           conn.commit()
           conn.close()
@@ -121,9 +121,15 @@ def release_resource(bed_id: str, doctor_id: str):
           conn = get_connection()
           c = conn.cursor()
           if bed_id:
-               c.execute("UPDATE beds SET occupied=0, patient_id=NULL WHERE bed_id=?",(bed_id,))
+               c.execute(
+                    "UPDATE beds SET occupied=0, patient_id=NULL WHERE bed_id=?",
+                    (bed_id,)
+               )
           if doctor_id:
-               c.execute("UPDATE doctors SET busy=0, patiend_id_NULL WHERE doctor_id=?",(doctor_id,))
+               c.execute(
+                    "UPDATE doctors SET busy=0, patient_id=NULL WHERE doctor_id=?",
+                    (doctor_id,)
+               )
           conn.commit()
           conn.close()
 
