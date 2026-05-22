@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import PatientAdmitRequest, ALLocationResponse
 from app.graph.workflow import get_graph
-from app.services.db_services import save_patient, get_all_patients,discharge_patient, get_resource_snapshot
+from app.services.db_services import save_patient, get_all_patients,discharge_patient, get_resource_snapshot,assign_doctor_to_patient
 from app.utils.logger import get_logger
 
 router = APIRouter(prefix="/api/v1", tags=["patients"])
@@ -36,6 +36,18 @@ async def discharge(patient_id: str):
      discharge_patient(patient_id)
      return {"message": f"Patient {patient_id} discharged successfully."}
 
+@router.post("/assign-doctor/{patient_id}")
+def assign_doctor(patient_id: str):
+    doctor = assign_doctor_to_patient(patient_id)
+
+    if not doctor:
+        raise HTTPException(status_code=404, detail="No doctor available or patient not found")
+
+    return {
+        "patient_id": patient_id,
+        "assigned_doctor": doctor,
+        "message": "Doctor assigned successfully"
+    }
 
 @router.get("/resources")
 async def resources():

@@ -197,3 +197,32 @@ def reset_resources():
      c.execute("UPDATE doctors SET busy=0, patient_id=NULL")
      conn.commit()
      conn.close()
+
+def assign_doctor_to_patient(patient_id: str):
+    conn = get_connection()
+    c = conn.cursor()
+
+    doctor = c.execute(
+        "SELECT doctor_id FROM doctors WHERE busy=0 LIMIT 1"
+    ).fetchone()
+
+    if not doctor:
+        conn.close()
+        return None
+
+    doctor_id = doctor["doctor_id"]
+
+    c.execute(
+        "UPDATE doctors SET busy=1, patient_id=? WHERE doctor_id=?",
+        (patient_id, doctor_id)
+    )
+
+    c.execute(
+        "UPDATE patients SET assigned_doctor=? WHERE patient_id=?",
+        (doctor_id, patient_id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return doctor_id

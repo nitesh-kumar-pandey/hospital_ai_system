@@ -134,6 +134,13 @@ def discharge(pid: str):
         return False
 
 
+def assign_doctor(pid: str):
+    try:
+        r = requests.post(f"{API_BASE}/assign-doctor/{pid}", timeout=10)
+        return r.json(), r.status_code
+    except Exception as e:
+        return {"error": str(e)}, 500
+    
 # ── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## 🏥 MediAI")
@@ -392,12 +399,39 @@ elif "Queue" in page:
 
                 st.markdown(f"**🤖 AI Reasoning:** {p.get('priority_reasoning', '—')}")
 
-                if p.get("status") != "Discharged" and p.get("assigned_bed"):
-                    if st.button(f"✅ Discharge {p.get('patient_id')}", key=p["patient_id"]):
-                        if discharge(p["patient_id"]):
-                            st.success("Patient discharged. Resources freed.")
-                            time.sleep(0.5)
-                            st.rerun()
+                if str(p.get("status", "")).strip().lower() != "discharged":
+
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        if st.button(
+                            f"✅ Discharge",
+                            key=f"d_{p['patient_id']}"
+                        ):
+                            if discharge(p["patient_id"]):
+                                st.success("Patient discharged successfully.")
+                                time.sleep(0.5)
+                                st.rerun()
+                            else:
+                                st.error("Failed to discharge patient.")
+
+
+                    with col2:
+                        if not p.get("assigned_doctor"):
+                            if st.button(
+                                f"👨‍⚕️ Assign Doctor",
+                                key=f"a_{p['patient_id']}"
+                            ):
+                                result, code = assign_doctor(p["patient_id"])
+
+                                if code == 200:
+                                    st.success(f"Doctor assigned: {result.get('assigned_doctor')}")
+                                    time.sleep(0.5)
+                                    st.rerun()
+                                else:
+                                    st.error(result.get("detail", "No doctor available"))
+                        else:
+                            st.success(f"👨‍⚕️ Doctor Assigned")
 
 
 # ── Page: Dashboard ────────────────────────────────────────────────────────
