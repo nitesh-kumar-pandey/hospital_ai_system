@@ -168,14 +168,15 @@ def smart_allocate_doctor(
 
     if not available:
         return {
-            "patient_id": patient_id,
-            "assigned_doctor": None,
-            "specialization": None,
+            "patient_id":       patient_id,
+            "assigned_doctor":  None,
+            "doctor_email":     "",
+            "specialization":   None,
             "experience_years": None,
-            "match_score": 0,
-            "match_reason": "No doctors are currently available. Patient placed in queue.",
-            "fallback_used": True,
-            "error": "All doctors are busy",
+            "match_score":      0,
+            "match_reason":     "No doctors are currently available. Patient placed in queue.",
+            "fallback_used":    True,
+            "error":            "All doctors are busy",
         }
 
     # Infer needed specialties
@@ -216,12 +217,13 @@ def smart_allocate_doctor(
                     break
 
     return {
-        "patient_id": patient_id,
-        "assigned_doctor": best_doc["name"] if assigned else None,
-        "specialization": best_doc.get("specialization"),
+        "patient_id":       patient_id,
+        "assigned_doctor":  best_doc["name"] if assigned else None,
+        "doctor_email":     best_doc.get("email", ""),
+        "specialization":   best_doc.get("specialization"),
         "experience_years": best_doc.get("experience_years"),
-        "match_score": best_score,
-        "match_reason": reason,
-        "fallback_used": fallback,
+        "match_score":      best_score,
+        "match_reason":     reason,
+        "fallback_used":    fallback,
         "error": None if assigned else "Doctor recommendation generated but not assigned to DB",
     }

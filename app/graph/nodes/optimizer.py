@@ -57,7 +57,23 @@ def optimizer_node(state: dict) -> dict:
 
 
 def _estimate_wait(priority: str, available: int) -> int:
-    base = {"Critical": 0, "High": 10, "Medium": 30, "Low": 60}.get(priority, 30)
+    base = {
+        "Critical": 0,
+        "High": 10,
+        "Medium": 20,
+        "Low": 30
+    }.get(priority, 20)
+
+    # No doctors/resources available
     if available == 0:
         base += 45
+
+    # Plenty of doctors available
+    elif available >= 10:
+        base = max(5, base - 15)
+
+    # Moderate availability
+    elif available >= 5:
+        base = max(10, base - 5)
+
     return base

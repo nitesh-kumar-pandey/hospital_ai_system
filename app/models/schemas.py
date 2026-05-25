@@ -28,16 +28,23 @@ class PatientAdmitRequest(BaseModel):
 # ── Allocation Response ────────────────────────────────────────────────────
 class ALLocationResponse(BaseModel):
     patient_id: str
-    patient_name: Optional[str]
-    priority_level: Optional[str]
-    priority_score: Optional[int]
-    priority_reasoning: Optional[str]
-    assigned_bed: Optional[str]
-    assigned_doctor: Optional[str]
-    estimated_wait_minutes: Optional[int]
-    status: Optional[str]
-    timestamp: Optional[str]
-    errors: Optional[list]
+    patient_name: Optional[str] = None
+    priority_level: Optional[str] = None
+    priority_score: Optional[int] = None
+    priority_reasoning: Optional[str] = None
+    assigned_bed: Optional[str] = None
+    assigned_doctor: Optional[str] = None
+    estimated_wait_minutes: Optional[int] = None
+    status: Optional[str] = None
+    timestamp: Optional[str] = None
+    errors: Optional[list] = None
+
+    # Smart doctor + email fields
+    doctor_email: Optional[str] = None
+    doctor_spec: Optional[str] = None
+    match_score: Optional[int] = None
+    match_reason: Optional[str] = None
+    email_status: Optional[Dict[str, Any]] = None
 
 
 # ── Medical Report Summary ─────────────────────────────────────────────────

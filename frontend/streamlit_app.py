@@ -163,6 +163,12 @@ def call_summarise_report(file_bytes: bytes, filename: str, content_type: str):
 with st.sidebar:
     st.markdown("## 🏥 MediAI")
     st.markdown("**Resource Allocation System**")
+    st.markdown("""
+    <div style="background:#0d2a1a;border:1px solid #00e676;border-radius:8px;
+                padding:8px 12px;margin:8px 0;font-size:12px;color:#00e676;">
+        ⚡ Powered by <b>Groq</b> — Free LLM API
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown("---")
 
     page = st.radio(
@@ -176,7 +182,15 @@ with st.sidebar:
         ],
         label_visibility="collapsed",
     )
+    st.markdown("---")
 
+    st.markdown("### 🤖 AI Model")
+    groq_model = st.selectbox(
+        "Groq Model",
+        ["llama-3.1-8b-instant", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma2-9b-it"],
+        label_visibility="collapsed",
+    )
+    st.caption(f"Model: `{groq_model}` (free)")
     st.markdown("---")
 
     st.markdown("### 🔴 Live Resources")
@@ -409,58 +423,92 @@ if "Admit" in page:
 
             st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
 
-            # ── Step 3: Smart doctor allocation (silent — no UI section) ──
-            # Runs in the background; result is shown inside the doctor card above.
-            with st.spinner("🩺 Finding best-matched doctor..."):
-                sd_payload = {
-                    "patient_id":          result.get("patient_id"),
-                    "symptoms":            symptoms,
-                    "predicted_condition": predicted_condition,
-                    "priority_level":      level,
-                    "age":                 age,
-                    "vitals":              vitals_payload,
-                }
-                sd_result, sd_code = call_smart_doctor(sd_payload)
+            # ── Step 3: Doctor card + email status ────────────────────────
+            # The backend /allocate endpoint already ran smart doctor
+            # allocation AND sent the email. We just display what came back.
+            doc_name     = result.get("assigned_doctor")
+            spec         = result.get("doctor_spec", result.get("specialization", "—"))
+            sd_score     = result.get("match_score", 0)
+            reason       = result.get("match_reason", result.get("priority_reasoning", "—"))
+            email_status = result.get("email_status", {})
 
-            # Show final assigned-doctor card (compact, no "Smart Doctor" heading)
-            if sd_code == 200 and sd_result.get("assigned_doctor"):
-                doc_name = sd_result["assigned_doctor"]
-                spec     = sd_result.get("specialization", "—")
-                exp      = sd_result.get("experience_years", "—")
-                sd_score = sd_result.get("match_score", 0)
-                reason   = sd_result.get("match_reason", "—")
-                sc_color = "#00e676" if sd_score >= 70 else "#ffd600" if sd_score >= 40 else "#ff6d00"
+            if doc_name:
+                sc_color = (
+                    "#00e676" if sd_score >= 70
+                    else "#ffd600" if sd_score >= 40
+                    else "#ff6d00"
+                )
 
+                # Doctor card
                 st.markdown(f"""
                 <div style="background:linear-gradient(135deg,#0a1f2a,#0d2a3a);
                             border:2px solid #00d4ff44;border-radius:14px;
-                            padding:20px;margin:4px 0 16px;">
+                            padding:20px;margin:4px 0 10px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <div>
-                            <div style="font-size:11px;color:#7a9bb5;letter-spacing:1px;margin-bottom:4px;">
+                            <div style="font-size:11px;color:#7a9bb5;
+                                        letter-spacing:1px;margin-bottom:4px;">
                                 👨‍⚕️ ASSIGNED DOCTOR
                             </div>
-                            <div style="font-size:22px;font-weight:700;color:#00d4ff;">{doc_name}</div>
+                            <div style="font-size:22px;font-weight:700;
+                                        color:#00d4ff;">{doc_name}</div>
                             <div style="color:#b0c8d8;margin-top:4px;font-size:13px;">
-                                <b>Specialization:</b> {spec} &nbsp;|&nbsp; <b>Experience:</b> {exp} yrs
+                                <b>Specialization:</b> {spec or "—"}
                             </div>
                         </div>
                         <div style="text-align:right;">
-                            <div style="font-size:11px;color:#7a9bb5;letter-spacing:1px;">MATCH SCORE</div>
-                            <div style="font-size:36px;font-weight:700;color:{sc_color};font-family:monospace;">
-                                {sd_score}<span style="font-size:14px;color:#7a9bb5;">/100</span>
+                            <div style="font-size:11px;color:#7a9bb5;
+                                        letter-spacing:1px;">MATCH SCORE</div>
+                            <div style="font-size:36px;font-weight:700;
+                                        color:{sc_color};font-family:monospace;">
+                                {sd_score}<span style="font-size:14px;
+                                color:#7a9bb5;">/100</span>
                             </div>
                         </div>
                     </div>
-                    <div style="background:#0a1525;border-radius:8px;padding:10px 12px;margin-top:12px;">
+                    <div style="background:#0a1525;border-radius:8px;
+                                padding:10px 12px;margin-top:12px;">
                         <b style="color:#7a9bb5;font-size:11px;">WHY THIS DOCTOR</b><br>
                         <span style="color:#e0f0ff;font-size:13px;">{reason}</span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-            elif sd_result.get("error") == "All doctors are busy":
+
+                # Email notification status banner
+                if email_status.get("sent"):
+                    st.markdown(f"""
+                    <div style="background:#00e67611;border:1px solid #00e676;
+                                border-radius:10px;padding:12px 16px;margin:6px 0;">
+                        <span style="color:#00e676;font-weight:600;">
+                            ✉️ Email notification sent
+                        </span>
+                        <span style="color:#b0c8d8;font-size:13px;margin-left:8px;">
+                            — {email_status.get('message', '')}
+                        </span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    em_msg = email_status.get("message", "Email not sent.")
+                    # Only show warning if it's a real failure, not dev-mode skip
+                    if "disabled" in em_msg.lower() or "dev mode" in em_msg.lower():
+                        st.markdown(f"""
+                        <div style="background:#ffd60011;border:1px solid #ffd600;
+                                    border-radius:10px;padding:10px 14px;margin:6px 0;">
+                            <span style="color:#ffd600;font-weight:600;">
+                                📧 Email disabled (dev mode)
+                            </span>
+                            <span style="color:#b0c8d8;font-size:12px;margin-left:6px;">
+                                — Set EMAIL_ENABLED=true and configure SMTP_* in .env to enable.
+                            </span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.warning(
+                            f"⚠️ Patient admitted successfully, but doctor email notification "
+                            f"failed: {em_msg}"
+                        )
+            else:
                 st.warning("⚠️ All doctors are currently busy — patient added to the queue.")
-            # Any other error is silently swallowed; basic assignment from allocate() already ran.
 
 
 # ══════════════════════════════════════════════════════════════════════════
