@@ -178,7 +178,6 @@ with st.sidebar:
     )
     st.markdown("---")
 
-
     st.markdown("### 🔴 Live Resources")
     res = get_resources()
     col_a, col_b = st.columns(2)
