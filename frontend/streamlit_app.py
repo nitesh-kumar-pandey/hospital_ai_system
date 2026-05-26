@@ -163,12 +163,6 @@ def call_summarise_report(file_bytes: bytes, filename: str, content_type: str):
 with st.sidebar:
     st.markdown("## 🏥 MediAI")
     st.markdown("**Resource Allocation System**")
-    st.markdown("""
-    <div style="background:#0d2a1a;border:1px solid #00e676;border-radius:8px;
-                padding:8px 12px;margin:8px 0;font-size:12px;color:#00e676;">
-        ⚡ Powered by <b>Groq</b> — Free LLM API
-    </div>
-    """, unsafe_allow_html=True)
     st.markdown("---")
 
     page = st.radio(
@@ -184,14 +178,6 @@ with st.sidebar:
     )
     st.markdown("---")
 
-    st.markdown("### 🤖 AI Model")
-    groq_model = st.selectbox(
-        "Groq Model",
-        ["llama-3.1-8b-instant", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma2-9b-it"],
-        label_visibility="collapsed",
-    )
-    st.caption(f"Model: `{groq_model}` (free)")
-    st.markdown("---")
 
     st.markdown("### 🔴 Live Resources")
     res = get_resources()
