@@ -203,11 +203,11 @@ if "Admit" in page:
 
     with col1:
         st.markdown("### 👤 Patient Info")
-        patient_name = st.text_input("Full Name", placeholder="e.g. Rahul Sharma")
-        age          = st.number_input("Age", min_value=0, max_value=120, value=40)
+        patient_name = st.text_input("Full Name *", placeholder=" Rahul Sharma")
+        age          = st.number_input("Age *", min_value=0, max_value=120, value=00)
         symptoms     = st.text_area(
-            "Symptoms",
-            placeholder="Describe symptoms in detail...\ne.g. Severe chest pain radiating to left arm, sweating, shortness of breath",
+            "Symptoms *",
+            placeholder="Describe symptoms in detail...\nSevere chest pain radiating to left arm, sweating, shortness of breath",
             height=120,
         )
 
